@@ -49,7 +49,7 @@ export default class ProdutoDAO {
         //termo é um número
         const conexao = await conectar();
         let listaProdutos = [];
-        if (!isNaN(Number(termo))){
+        if (!isNaN(parseInt(termo))){
             //consulta pelo código do produto
             const sql = `SELECT p.prod_codigo, p.prod_descricao,
               p.prod_precoCusto, p.prod_precoVenda, p.prod_dataValidade, 

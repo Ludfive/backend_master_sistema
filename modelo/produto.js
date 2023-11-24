@@ -26,7 +26,7 @@ export default class Produto{
         return this.#codigo;
     }
     set codigo(novoCodigo){
-        this.codigo = novoCodigo;
+        this.#codigo = novoCodigo;
     }
 
     get descricao(){
@@ -54,7 +54,7 @@ export default class Produto{
     }
 
     get dataValidade(){
-        return this.#dataValidade();
+        return this.#dataValidade;
     }
 
     set dataValidade(novaData){
