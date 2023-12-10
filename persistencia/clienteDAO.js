@@ -1,9 +1,9 @@
-import Cliente from "../model/cliente.js";
+import Cliente from "../modelo/cliente.js";
 import conectar from "./conexao.js";
 
-export default class ClientDAO {
+export default class ClienteDAO {
   async gravar(cliente) {
-    if (cliente instanceof Client) {
+    if (cliente instanceof Cliente) {
       const sql =
         "INSERT INTO cliente(cli_documento, cli_nome, cli_bairro, cli_endereco, cli_cidade, cli_uf, cli_numero, cli_cep) \
         VALUES(?, ?, ? , ?, ?, ?, ?, ?)";

@@ -1,6 +1,6 @@
 import VendaDAO from "../persistencia/vendaDAO.js"
 
-export default class Sale {
+export default class Venda {
     #id
     #cliente
     #valor

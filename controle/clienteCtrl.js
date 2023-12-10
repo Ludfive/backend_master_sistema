@@ -1,6 +1,6 @@
-import Cliente from "../model/cliente.js";
+import Cliente from "../modelo/cliente.js";
 
-export default class ClientController {
+export default class ClienteCtrl {
   post(req, res) {
     res.type("application/json");
     if (req.method === "POST" && req.is("application/json")) {

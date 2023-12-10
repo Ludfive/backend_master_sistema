@@ -1,4 +1,4 @@
-import Fornecedor from "../modelo/fornecedor";
+import Fornecedor from "../modelo/fornecedor.js";
 
 export default class FornecedorCtrl {
   post(req, res) {

@@ -1,5 +1,5 @@
 import CompraDAO from "../persistencia/compraDAO.js"
-export default class Purchase {
+export default class Compra {
     #id
     #quantidade
     #valor

@@ -1,6 +1,6 @@
 import FornecedorDAO from "../persistencia/fornecedorDAO.js";
 
-export default class Provider {
+export default class Fornecedor {
   #id;
   #documento;
   #nome;
