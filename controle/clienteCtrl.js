@@ -1,20 +1,48 @@
-import Categoria from "../modelo/categoria.js";
+import Cliente from "../model/cliente.js";
 
-export default class CategoriaCtrl {
+export default class ClientController {
   post(req, res) {
     res.type("application/json");
     if (req.method === "POST" && req.is("application/json")) {
       try {
-        const { nome, descricao } = req.body;
-        if (nome && descricao) {
-          const categoria = new Categoria(0, nome, descricao);
-          categoria
+        const {
+          documento,
+          nome,
+          bairro,
+          endereco,
+          cidade,
+          uf,
+          numero,
+          cep,
+        } = req.body;
+        if (
+          documento &&
+          nome &&
+          bairro &&
+          endereco &&
+          cidade &&
+          uf &&
+          numero &&
+          cep
+        ) {
+          const cliente = new Cliente(
+            0,
+            documento,
+            nome,
+            bairro,
+            endereco,
+            cidade,
+            uf,
+            numero,
+            cep
+          );
+          cliente
             .gravar()
             .then(() => {
               res.status(200).send({
                 status: true,
-                message: "Categoria já cadastrada!",
-                categoria: categoria,
+                message: "Cliente cadastrado!",
+                cliente: cliente
               });
             })
             .catch((e) => {
@@ -39,7 +67,7 @@ export default class CategoriaCtrl {
       res.status(400).json({
         status: false,
         mensagem:
-          "Por favor, utilize os métodos POST para cadastrar uma categoria!",
+          "Por favor, utilize os métodos POST para cadastrar um cliente!",
       });
     }
   }
@@ -50,35 +78,64 @@ export default class CategoriaCtrl {
       (req.method === "PUT" || req.method === "PATCH") &&
       req.is("application/json")
     ) {
-      const { codigo } = req.params;
-      const { nome, descricao } = req.body;
-      if (codigo && nome && descricao) {
-        const categoria = new Categoria(codigo, nome, descricao);
-        categoria
+      const { id } = req.params;
+      const {
+        documento,
+        nome,
+        bairro,
+        endereco,
+        cidade,
+        uf,
+        numero,
+        cep,
+      } = req.body;
+      if (
+        id &&
+        documento &&
+        nome &&
+        bairro &&
+        endereco &&
+        cidade &&
+        uf &&
+        numero &&
+        cep
+      ) {
+        const cliente = new Cliente(
+          id,
+          documento,
+          nome,
+          bairro,
+          endereco,
+          cidade,
+          uf,
+          numero,
+          cep
+        );
+        cliente
           .atualizar()
           .then(() => {
             res.status(200).json({
               status: true,
-              mensagem: "Categoria atualizada com sucesso!",
+              mensagem: "Cliente atualizado com sucesso!",
             });
           })
           .catch((erro) => {
             res.status(500).json({
               status: false,
-              mensagem: "Erro ao atualizar a categoria:" + erro.message,
+              mensagem: "Erro ao atualizar o cliente:" + erro.message,
             });
           });
       } else {
         res.status(400).json({
           status: false,
-          mensagem: "Por favor, informe o código e a descrição da categoria!",
+          mensagem: "Por favor, informe todos os dados do cliente!",
         });
       }
     } else {
       res.status(400).json({
         status: false,
         mensagem:
-          "Por favor, utilize os métodos PUT ou PATCH para atualizar uma categoria!",
+          "Por favor, utilize os métodos PUT ou PATCH para atualizar um cliente!",
       });
     }
   }
@@ -86,34 +143,33 @@ export default class CategoriaCtrl {
   delete(req, res) {
     res.type("application/json");
     if (req.method === "DELETE") {
-      const { codigo } = req.params;
-      if (codigo) {
-        const categoria = new Categoria(codigo);
-        categoria
+      const { id } = req.params;
+      if (id) {
+        const cliente = new Cliente(id);
+        cliente
           .excluir()
           .then(() => {
             res.status(200).json({
               status: true,
-              mensagem: "Categoria excluída com sucesso!",
+              mensagem: "Cliente excluído com sucesso!",
             });
           })
           .catch((erro) => {
             res.status(500).json({
               status: false,
-              mensagem: "Erro ao excluir a categoria:" + erro.message,
+              mensagem: "Erro ao excluir o cliente:" + erro.message,
             });
           });
       } else {
         res.status(400).json({
           status: false,
-          mensagem: "Por favor, informe o código da categoria!",
+          mensagem: "Por favor, informe o id do cliente!",
         });
       }
     } else {
       res.status(400).json({
         status: false,
-        mensagem:
-          "Por favor, utilize o método DELETE para excluir uma categoria!",
+        mensagem: "Por favor, utilize o método DELETE para excluir um cliente!",
       });
     }
   }
@@ -122,17 +178,17 @@ export default class CategoriaCtrl {
     res.type("application/json");
     if (req.method === "GET") {
       const { nome } = req.query;
-      const { cod } = req.params;
+      const { id } = req.params;
       let parametro = "";
 
       if (nome) {
         parametro = nome;
-      } else if (cod) {
-        parametro = cod;
+      } else if(id){
+        parametro = id;
       }
 
-      const categoria = new Categoria();
-      categoria
+      const cliente = new Cliente();
+      cliente
         .consultar(parametro)
         .then((lista) => {
           res.status(200).send({

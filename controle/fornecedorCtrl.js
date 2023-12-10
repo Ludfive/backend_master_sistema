@@ -1,20 +1,36 @@
-import Categoria from "../modelo/categoria.js";
+import Fornecedor from "../modelo/fornecedor";
 
-export default class CategoriaCtrl {
+export default class FornecedorCtrl {
   post(req, res) {
     res.type("application/json");
     if (req.method === "POST" && req.is("application/json")) {
       try {
-        const { nome, descricao } = req.body;
-        if (nome && descricao) {
-          const categoria = new Categoria(0, nome, descricao);
-          categoria
+        const { documento, nome, numTel, email, site, descricao } =
+          req.body;
+        if (
+          documento &&
+          nome &&
+          numTel &&
+          email &&
+          site &&
+          descricao
+        ) {
+          const fornecedor = new Fornecedor(
+            0,
+            documento,
+            nome,
+            numTel,
+            email,
+            site,
+            descricao
+          );
+          fornecedor
             .gravar()
             .then(() => {
               res.status(200).send({
                 status: true,
-                message: "Categoria já cadastrada!",
-                categoria: categoria,
+                message: "Fornecedor cadastrado!",
+                fornecedor
               });
             })
             .catch((e) => {
@@ -35,13 +51,7 @@ export default class CategoriaCtrl {
           message: e,
         });
       }
-    } else {
-      res.status(400).json({
-        status: false,
-        mensagem:
-          "Por favor, utilize os métodos POST para cadastrar uma categoria!",
-      });
-    }
+    } else return res.status(400).send();
   }
 
   put(req, res) {
@@ -50,35 +60,43 @@ export default class CategoriaCtrl {
       (req.method === "PUT" || req.method === "PATCH") &&
       req.is("application/json")
     ) {
-      const { codigo } = req.params;
-      const { nome, descricao } = req.body;
-      if (codigo && nome && descricao) {
-        const categoria = new Categoria(codigo, nome, descricao);
-        categoria
+      const { documento } = req.params;
+      const { nome, numTel, email, site, descricao } = req.body;
+      if (documento && nome && numTel && email && site && descricao) {
+        const fornecedor = new Fornecedor(
+          0,
+          documento,
+          nome,
+          numTel,
+          email,
+          site,
+          descricao
+        );
+        fornecedor
           .atualizar()
           .then(() => {
             res.status(200).json({
               status: true,
-              mensagem: "Categoria atualizada com sucesso!",
+              mensagem: "Fornecedor atualizado com sucesso!",
             });
           })
           .catch((erro) => {
             res.status(500).json({
               status: false,
-              mensagem: "Erro ao atualizar a categoria:" + erro.message,
+              mensagem: "Erro ao atualizar o fornecedor:" + erro.message,
             });
           });
       } else {
         res.status(400).json({
           status: false,
-          mensagem: "Por favor, informe o código e a descrição da categoria!",
+          mensagem: "Por favor, informe todos os dados!",
         });
       }
     } else {
       res.status(400).json({
         status: false,
         mensagem:
-          "Por favor, utilize os métodos PUT ou PATCH para atualizar uma categoria!",
+          "Por favor, utilize os métodos PUT ou PATCH para atualizar um fornecedor!",
       });
     }
   }
@@ -86,34 +104,34 @@ export default class CategoriaCtrl {
   delete(req, res) {
     res.type("application/json");
     if (req.method === "DELETE") {
-      const { codigo } = req.params;
-      if (codigo) {
-        const categoria = new Categoria(codigo);
-        categoria
+      const { documento } = req.params;
+      if (documento) {
+        const fornecedor = new Fornecedor(0, documento);
+        fornecedor
           .excluir()
           .then(() => {
             res.status(200).json({
               status: true,
-              mensagem: "Categoria excluída com sucesso!",
+              mensagem: "Fornecedor excluído com sucesso!",
             });
           })
           .catch((erro) => {
             res.status(500).json({
               status: false,
-              mensagem: "Erro ao excluir a categoria:" + erro.message,
+              mensagem: "Erro ao excluir o fornecedor:" + erro.message,
             });
           });
       } else {
         res.status(400).json({
           status: false,
-          mensagem: "Por favor, informe o código da categoria!",
+          mensagem: "Por favor, informe o documento do fornecedor!",
         });
       }
     } else {
       res.status(400).json({
         status: false,
         mensagem:
-          "Por favor, utilize o método DELETE para excluir uma categoria!",
+          "Por favor, utilize o método DELETE para excluir um fornecedor!",
       });
     }
   }
@@ -122,17 +140,17 @@ export default class CategoriaCtrl {
     res.type("application/json");
     if (req.method === "GET") {
       const { nome } = req.query;
-      const { cod } = req.params;
+      const { documento } = req.params;
       let parametro = "";
-
+      
       if (nome) {
         parametro = nome;
-      } else if (cod) {
-        parametro = cod;
+      } else if (documento) {
+        parametro = documento;
       }
 
-      const categoria = new Categoria();
-      categoria
+      const fornecedor = new Fornecedor();
+      fornecedor
         .consultar(parametro)
         .then((lista) => {
           res.status(200).send({
