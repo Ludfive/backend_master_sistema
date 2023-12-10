@@ -1,62 +1,65 @@
 import CategoriaDAO from "../persistencia/categoriaDAO.js";
-//não esqueça do .js no final da importação
 
 export default class Categoria {
-    //definição dos atributos privados
-    #codigo;
-    #descricao;
+  #cod;
+  #nome;
+  #descricao;
 
-    constructor(codigo=0, descricao=''){
-        this.#codigo=codigo;
-        this.#descricao=descricao;
-    }
+  constructor(cod = 0, nome = "", descricao = "") {
+    this.#cod = cod;
+    this.#nome = nome;
+    this.#descricao = descricao;
+  }
 
-    //métodos de acesso públicos
+  get cod(){
+    return this.#cod;
+  }
 
-    get codigo(){
-        return this.#codigo;
-    }
+  set cod(novoCod){
+    this.#cod = novoCod;
+  }
+  
+  get nome() {
+    return this.#nome;
+  }
 
-    set codigo(novoCodigo){
-        this.#codigo = novoCodigo;
-    }
+  set nome(novoNome) {
+    novoNome = this.#nome;
+  }
 
-    get descricao(){
-        return this.#descricao;
-    }
+  get descricao() {
+    return this.#descricao;
+  }
 
-    set descricao(novaDesc){
-        this.#descricao = novaDesc;
-    }
+  set descricao(novaDescricao) {
+    this.#descricao = novaDescricao;
+  }
 
-    //override do método toJSON
-    toJSON()     
-    {
-        return {
-            codigo:this.#codigo,
-            descricao:this.#descricao
-        }
-    }
+  toJSON() {
+    return {
+      cod: this.#cod,
+      nome: this.#nome,
+      descricao: this.#descricao,
+    };
+  }
 
-    //camada de modelo acessa a camada de persistencia
-    async gravar(){
-        const catDAO = new CategoriaDAO();
-        await catDAO.gravar(this);
-    }
+  async gravar() {
+    const catDAO = new CategoriaDAO();
+    await catDAO.gravar(this);
+  }
 
-    async excluir(){
-        const catDAO = new CategoriaDAO();
-        await catDAO.excluir(this);
-    }
+  async excluir() {
+    const catDAO = new CategoriaDAO();
+    await catDAO.excluir(this);
+  }
 
-    async atualizar(){
-        const catDAO = new CategoriaDAO();
-        await catDAO.atualizar(this);
+  async atualizar() {
+    const catDAO = new CategoriaDAO();
+    await catDAO.atualizar(this);
+  }
 
-    }
-
-    async consultar(parametro){
-        const catDAO = new CategoriaDAO();
-        return await catDAO.consultar(parametro);
-    }
+  async consultar(parametro) {
+    const catDAO = new CategoriaDAO();
+    return await catDAO.consultar(parametro);
+  }
 }

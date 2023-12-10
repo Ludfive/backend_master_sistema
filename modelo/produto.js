@@ -1,113 +1,153 @@
 import ProdutoDAO from "../persistencia/produtoDAO.js";
 
-export default class Produto{
-    #codigo;
-    #descricao;
-    #precoCusto;
-    #precoVenda;
-    #dataValidade;
-    #qtdEstoque;
-    #categoria;
+export default class Produto {
+  #id;
+  #nome;
+  #descricao;
+  #precoUnit;
+  #qtdEstoque;
+  #marca;
+  #modelo;
+  #dataProducao;
+  #categoria;
+  #fornecedor;
 
+  constructor(
+    id = "",
+    nome = "",
+    descricao = "",
+    precoUnit = 0,
+    qtdEstoque = 0,
+    marca = "",
+    modelo = "",
+    dataProducao = "",
+    categoria = {},
+    fornecedor = {}
+  ) {
+    this.#id = id;
+    this.#nome = nome;
+    this.#descricao = descricao;
+    this.#precoUnit = precoUnit;
+    this.#qtdEstoque = qtdEstoque;
+    this.#marca = marca;
+    this.#modelo = modelo;
+    this.#dataProducao = dataProducao;
+    this.#categoria = categoria;
+    this.#fornecedor = fornecedor;
+  }
 
-    constructor(codigo=0,descricao="", precoCusto=0, 
-                precoVenda=0,dataValidade='', qtdEstoque=0,
-                categoria={}){
-        this.#codigo=codigo;
-        this.#descricao=descricao;
-        this.#precoCusto=precoCusto;
-        this.#precoVenda=precoVenda;
-        this.#dataValidade=dataValidade;
-        this.#qtdEstoque=qtdEstoque;
-        this.#categoria=categoria;
-    }
+  get id() {
+    return this.#id;
+  }
 
-    get codigo(){
-        return this.#codigo;
-    }
-    set codigo(novoCodigo){
-        this.#codigo = novoCodigo;
-    }
+  set id(novoId) {
+    this.#id = novoId;
+  }
 
-    get descricao(){
-        return this.#descricao;
-    }
+  get nome() {
+    return this.#nome;
+  }
 
-    set descricao(novaDesc){
-        this.#descricao=novaDesc;
-    }
+  set nome(novoNome) {
+    this.#nome = novoNome;
+  }
 
-    get precoCusto(){
-        return this.#precoCusto;
-    }
+  get descricao() {
+    return this.#descricao;
+  }
 
-    set precoCusto(novoPreco){
-        this.#precoCusto = novoPreco
-    }
+  set descricao(novaDescricao) {
+    this.#descricao = novaDescricao;
+  }
 
-    get precoVenda(){
-        return this.#precoVenda;
-    }
-    
-    set precoVenda(novoPreco){
-        this.#precoVenda = novoPreco
-    }
+  get precoUnit() {
+    return this.#precoUnit;
+  }
 
-    get dataValidade(){
-        return this.#dataValidade;
-    }
+  set precoUnit(novoPreco) {
+    this.#precoUnit = novoPreco;
+  }
 
-    set dataValidade(novaData){
-        this.#dataValidade = novaData;
-    }
+  get qtdEstoque() {
+    return this.#qtdEstoque;
+  }
 
-    get qtdEstoque(){
-        return this.#dataValidade;
-    }
+  set qtdEstoque(novoEstoque) {
+    this.#qtdEstoque = novoEstoque;
+  }
 
-    set qtdEstoque(novaQtd){
-        this.#qtdEstoque = novaQtd;
-    }
+  get marca() {
+    return this.#marca;
+  }
 
-    get categoria(){
-        return this.#categoria
-    }
+  set marca(novaMarca) {
+    this.#marca = novaMarca;
+  }
 
-    set categoria(novaCategoria){
-        this.#categoria = novaCategoria;
-    }
+  get modelo() {
+    return this.#modelo;
+  }
 
-    toJSON(){
-        return {
-            codigo:this.#codigo,
-            descricao:this.#descricao,
-            precoCusto:this.#precoCusto,
-            precoVenda:this.#precoVenda,
-            dataValidade:this.#dataValidade,
-            qtdEstoque:this.#qtdEstoque,
-            categoria:this.#categoria.toJSON()
-        }
-    }
+  set modelo(novoModelo) {
+    this.#modelo = novoModelo;
+  }
 
-     //camada de modelo acessa a camada de persistencia
-     async gravar(){
-        const prodDAO = new ProdutoDAO();
-        await prodDAO.gravar(this);
-     }
- 
-     async excluir(){
-        const prodDAO = new ProdutoDAO();
-        await prodDAO.excluir(this);
-     }
- 
-     async alterar(){
-        const prodDAO = new ProdutoDAO();
-        await prodDAO.atualizar(this);
-     }
- 
-     async consultar(termo){
-        const prodDAO = new ProdutoDAO();
-        return await prodDAO.consultar(termo);
-     }
+  get dataProducao() {
+    return this.#dataProducao;
+  }
 
+  set dataProducao(novaData) {
+    this.#dataProducao = novaData;
+  }
+
+  get categoria() {
+    return this.#categoria;
+  }
+
+  set categoria(novaCategoria) {
+    this.#categoria = novaCategoria;
+  }
+
+  get fornecedor() {
+    return this.#fornecedor;
+  }
+
+  set fornecedor(novoFornecedor) {
+    this.#fornecedor = novoFornecedor;
+  }
+
+  toJSON() {
+    return {
+      id: this.#id,
+      nome: this.#nome,
+      descricao: this.#descricao,
+      precoUnit: this.#precoUnit,
+      qtdEstoque: this.#qtdEstoque,
+      marca: this.#marca,
+      modelo: this.#modelo,
+      dataProducao: this.#dataProducao,
+      categoria: this.#categoria.toJSON(),
+      fornecedor: this.#fornecedor.toJSON(),
+    };
+  }
+
+  async gravar() {
+    const prodDAO = new ProdutoDAO();
+    await prodDAO.gravar(this);
+  }
+
+  async excluir() {
+    const prodDAO = new ProdutoDAO();
+    await prodDAO.excluir(this);
+  }
+
+  async atualizar() {
+    const prodDAO = new ProdutoDAO();
+    await prodDAO.atualizar(this);
+  }
+
+  async consultar(parametro) {
+    const prodDAO = new ProdutoDAO();
+    return await prodDAO.consultar(parametro);
+  }
 }

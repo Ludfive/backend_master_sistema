@@ -1,18 +1,13 @@
 import { Router } from "express";
 import CategoriaCtrl from "../controle/categoriaCtrl.js";
 
-//rotas é o mapeamento das requisições da web para um determinado
-//endpoint da aplicação
-
-const catCtrl = new CategoriaCtrl();
 const rotaCategoria = new Router();
+const controle = new CategoriaCtrl();
 
-rotaCategoria
-.get('/',catCtrl.consultar)
-.get('/:termo', catCtrl.consultar)
-.post('/',catCtrl.gravar)
-.patch('/',catCtrl.atualizar)
-.put('/',catCtrl.atualizar)
-.delete('/',catCtrl.excluir);
+rotaCategoria.post("/", controle.post);
+rotaCategoria.put("/:codigo", controle.put);
+rotaCategoria.delete("/:codigo", controle.delete);
+rotaCategoria.get("/", controle.get);
+rotaCategoria.get("/:cod", controle.get);
 
 export default rotaCategoria;

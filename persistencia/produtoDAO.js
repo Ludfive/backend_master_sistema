@@ -1,98 +1,152 @@
-import Produto from '../modelo/produto.js';
-import Categoria from '../modelo/categoria.js';
-import conectar from './conexao.js';
+import Produto from "../modelo/produto.js";
+import Categoria from "../modelo/categoria.js";
+import conectar from "./conexao.js";
+import Fornecedor from "../modelo/fornecedor";
 
 export default class ProdutoDAO {
+  async gravar(produto) {
+    if (produto instanceof Produto) {
+      const sql = `INSERT INTO produto(
+        prod_nome, 
+        prod_descricao,
+        prod_precoUnit,
+        prod_qtdEstoque,
+        prod_marca, 
+        prod_modelo, 
+        prod_dataProducao, 
+        cat_id, 
+        forn_id) VALUES(?,?,?,?,?,?,?,?,?)`;
+      const parametros = [
+        produto.nome,
+        produto.descricao,
+        produto.precoUnit,
+        produto.qtdEstoque,
+        produto.marca,
+        produto.modelo,
+        produto.dataProducao,
+        produto.categoria.id,
+        produto.fornecedor.id,
+      ];
 
-    async gravar(produto) {
-        if (produto instanceof Produto) {
-            const sql = `INSERT INTO produto(prod_descricao, prod_precoCusto,
-                prod_precoVenda, prod_dataValidade, prod_qtdEstoque, cat_codigo)
-                VALUES(?,?,?,?,?,?)`;
-            const parametros = [produto.descricao, produto.precoCusto, produto.precoVenda,
-            produto.dataValidade, produto.qtdEstoque, produto.categoria.codigo];
-
-            const conexao = await conectar();
-            const retorno = await conexao.execute(sql, parametros);
-            produto.codigo = retorno[0].insertId;
-            global.poolConexoes.releaseConnection(conexao);
-        }
+      const conexao = await conectar();
+      const retorno = await conexao.execute(sql, parametros);
+      produto.id = retorno[0].insertId;
+      global.poolConexoes.releaseConnection(conexao);
     }
-    async atualizar(produto) {
-        if (produto instanceof Produto) {
-            const sql = `UPDATE produto SET prod_descricao = ?, prod_precoCusto = ?,
-            prod_precoVenda = ?, prod_dataValidade = ?, prod_qtdEstoque = ?, cat_codigo = ?
-            WHERE prod_codigo = ?`;
-            const parametros = [produto.descricao, produto.precoCusto, produto.precoVenda,
-            produto.dataValidade, produto.qtdEstoque, produto.categoria.codigo, produto.codigo];
+  }
+  async atualizar(produto) {
+    if (produto instanceof Produto) {
+      const sql = `UPDATE produto SET prod_nome = ?, prod_descricao = ?,
+            prod_precoUnit = ?, prod_qtdEstoque = ?, prod_marca = ?, prod_modelo = ?, prod_dataProducao = ?,
+            cat_id = ? , forn_id = ?
+            WHERE prod_id = ?`;
+      const parametros = [
+        produto.nome,
+        produto.descricao,
+        produto.precoUnit,
+        produto.qtdEstoque,
+        produto.marca,
+        produto.modelo,
+        produto.dataProducao,
+        produto.categoria.id,
+        produto.fornecedor.id,
+        produto.id,
+      ];
 
-            const conexao = await conectar();
-            await conexao.execute(sql, parametros);
-            global.poolConexoes.releaseConnection(conexao);
-        }
+      const conexao = await conectar();
+      await conexao.execute(sql, parametros);
+      global.poolConexoes.releaseConnection(conexao);
+    }
+  }
+
+  async excluir(produto) {
+    if (produto instanceof Produto) {
+      const sql = `DELETE FROM produto WHERE prod_id = ?`;
+      const parametros = [produto.id];
+      const conexao = await conectar();
+      await conexao.execute(sql, parametros);
+      global.poolConexoes.releaseConnection(conexao);
+    }
+  }
+
+  async consultar(termo) {
+    termo = termo ?? ""; 
+
+    const conexao = await conectar();
+    const listaProdutos = [];
+
+    let sql;
+    let parametros;
+
+    if (termo === "") {
+      sql = `
+        SELECT 
+          p.prod_id, p.prod_nome, p.prod_descricao,
+          p.prod_precoUnit, p.prod_qtdEstoque, p.prod_marca, 
+          p.prod_modelo, p.prod_dataProducao,
+          c.cat_id, c.cat_nome, c.cat_descricao,
+          f.forn_id, f.forn_documento, f.forn_nome, f.forn_numTel,
+          f.forn_email, f.forn_site
+        FROM 
+          produto p
+          INNER JOIN categoria c ON p.cat_id = c.cat_id
+          INNER JOIN fornecedor f ON p.forn_id = f.forn_id
+        ORDER BY 
+          p.prod_descricao
+      `;
+      parametros = [];
+    } else {
+      sql = `
+        SELECT 
+          p.prod_id, p.prod_nome, p.prod_descricao,
+          p.prod_precoUnit, p.prod_qtdEstoque, p.prod_marca, 
+          p.prod_modelo, p.prod_dataProducao,
+          c.cat_id, c.cat_nome, c.cat_descricao,
+          f.forn_id, f.forn_documento, f.forn_nome, f.forn_numTel,
+          f.forn_email, f.forn_site
+        FROM 
+          produto p
+          INNER JOIN categoria c ON p.cat_id = c.cat_id
+          INNER JOIN fornecedor f ON p.forn_id = f.forn_id
+        WHERE 
+          ${isNaN(Number(termo)) ? "p.prod_nome LIKE ?" : "p.prod_id = ?"}
+        ORDER BY 
+          ${isNaN(Number(termo)) ? "p.prod_nome" : "p.prod_descricao"}
+      `;
+      parametros = isNaN(Number(termo)) ? [`%${termo}%`] : [termo];
     }
 
-    async excluir(produto) {
-        if (produto instanceof Produto) {
-            const sql = `DELETE FROM produto WHERE prod_codigo = ?`;
-            const parametros = [produto.codigo];
-            const conexao = await conectar();
-            await conexao.execute(sql, parametros);
-            global.poolConexoes.releaseConnection(conexao);
-        }
+    const [registros, campos] = await conexao.execute(sql, parametros);
+
+    for (const registro of registros) {
+      const categoria = new Categoria(
+        registro.cat_id,
+        registro.cat_nome,
+        registro.cat_descricao
+      );
+      const fornecedor = new Fornecedor(
+        registro.forn_id,
+        registro.forn_documento,
+        registro.forn_nome,
+        registro.forn_numTel,
+        registro.forn_email,
+        registro.forn_site,
+      );
+      const produto = new Produto(
+        registro.prod_id,
+        registro.prod_nome,
+        registro.prod_descricao,
+        registro.prod_precoUnit,
+        registro.prod_qtdEstoque,
+        registro.prod_marca,
+        registro.prod_modelo,
+        registro.prod_dataProducao,
+        categoria,
+        fornecedor
+      );
+      listaProdutos.push(produto);
     }
 
-    async consultar(termo) {
-        if (!termo){
-            termo="";
-        }
-        //termo é um número
-        const conexao = await conectar();
-        let listaProdutos = [];
-        if (!isNaN(parseInt(termo))){
-            //consulta pelo código do produto
-            const sql = `SELECT p.prod_codigo, p.prod_descricao,
-              p.prod_precoCusto, p.prod_precoVenda, p.prod_dataValidade, 
-              p.prod_qtdEstoque,
-              c.cat_codigo, c.cat_descricao
-              FROM produto p INNER JOIN categoria c ON p.cat_codigo = c.cat_codigo
-              WHERE p.prod_codigo = ?
-              ORDER BY p.prod_descricao               
-            `;
-            const parametros=[termo];
-            const [registros, campos] = await conexao.execute(sql,parametros);
-            for (const registro of registros){
-                const categoria = new Categoria(registro.cat_codigo,registro.cat_descricao);
-                const produto = new Produto(registro.prod_codigo,registro.prod_descricao,
-                                            registro.prod_precoCusto,registro.prod_precoVenda,
-                                            registro.prod_dataValidade, registro.prod_qtdEstoque,
-                                            categoria);
-                listaProdutos.push(produto);
-            }
-        }
-        else
-        {
-            //consulta pela descrição do produto
-            const sql = `SELECT p.prod_codigo, p.prod_descricao,
-              p.prod_precoCusto, p.prod_precoVenda, p.prod_dataValidade, 
-              p.prod_qtdEstoque,
-              c.cat_codigo, c.cat_descricao
-              FROM produto p INNER JOIN categoria c ON p.cat_codigo = c.cat_codigo
-              WHERE p.prod_descricao like ?
-              ORDER BY p.prod_descricao               
-            `;
-            const parametros=['%'+termo+'%'];
-            const [registros, campos] = await conexao.execute(sql,parametros);
-            for (const registro of registros){
-                const categoria = new Categoria(registro.cat_codigo,registro.cat_descricao);
-                const produto = new Produto(registro.prod_codigo,registro.prod_descricao,
-                                            registro.prod_precoCusto,registro.prod_precoVenda,
-                                            registro.prod_dataValidade, registro.prod_qtdEstoque,
-                                            categoria);
-                listaProdutos.push(produto);
-            }
-        }
-
-        return listaProdutos;
-    }
+    return listaProdutos;
+  }
 }

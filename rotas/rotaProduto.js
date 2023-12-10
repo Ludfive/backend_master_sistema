@@ -1,15 +1,13 @@
 import { Router } from "express";
 import ProdutoCtrl from "../controle/produtoCtrl.js";
 
-const prodCtrl = new ProdutoCtrl();
 const rotaProduto = new Router();
+const controle = new ProdutoCtrl();
 
-rotaProduto
-.get('/', prodCtrl.consultar)
-.get('/:termo', prodCtrl.consultar)
-.post('/', prodCtrl.gravar)
-.patch('/', prodCtrl.atualizar)
-.put('/', prodCtrl.atualizar)
-.delete('/', prodCtrl.excluir);
+rotaProduto.post("/", controle.post);
+rotaProduto.put("/:id", controle.put);
+rotaProduto.delete("/:id", controle.delete);
+rotaProduto.get("/", controle.get);
+rotaProduto.get("/:id", controle.get);
 
 export default rotaProduto;
